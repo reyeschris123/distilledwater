@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Refilling Management System</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyALkOVFTlQw89xNQ9RYBHLVP6Js8hrvRDQ&components=country:ph&libraries=places" async defer></script>
+    <!-- <script src="https://www.google.com/maps/d/edit?mid=1D9xTBaye6ZT_TDRvsTZNTO1VR1hmXlc&usp=sharing" async defer></script> -->
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+</head>
+
+<input type="file" id="importFile" accept=".csv">
+
+<script>
+    function initMap() {
+        // Set Batangas City as the center
+        const batangasCity = { lat: 13.7565, lng: 121.0583 };
+
+        // Initialize the map with Batangas City as the center
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 12,  // Adjust zoom level
+            center: batangasCity  // Center on Batangas City
+        });
+
+        // Optionally, add a marker at Batangas City
+        const marker = new google.maps.Marker({
+            position: batangasCity,
+            map: map,
+            title: "Batangas City"
+        });
+    }
+
+    // Ensure the map is initialized once the page is loaded
+    window.onload = function() {
+        initMap();
+    };
+</script>
+
+<div id="myNavbar" class="navbar"> <button class="close-btn" onclick="closeNav()">&#9633;</button>
+ 
+    <div class="logo-details">
+        <i class='bx bxl-c-plus-plus icon'></i>
+          <div class="logo_name">  </div>
+          <i class='bx bx-menu' id="btn" ></i>
+      </div>
+
+      <button onclick="showTab('customerForm')">
+        <i class="fas fa-users icon-img"></i> Customers
+    </button> 
+    <button onclick="showTab('customerReport')">
+        <i class="fas fa-file-alt icon-img"></i> Customer Report
+    </button>   
+    <button onclick="showTab('salesForm')">
+        <i class="fas fa-glass-whiskey icon-img"></i> Sales
+    </button>  
+    <button onclick="showTab('salesReport')">
+        <i class="fas fa-chart-line icon-img"></i> Sales Report
+    </button> 
+    <button onclick="showTab('productionData')">
+        <i class="fas fa-industry icon-img"></i> Production
+    </button>  
+    <button onclick="showTab('processForm')">
+        <i class="fas fa-cogs icon-img"></i> Process
+    </button>        
+    <button onclick="showTab('monthlyReport')">
+        <i class="fas fa-calendar-alt icon-img"></i> Monthly Report
+    </button> 
+    <button onclick="showTab('chartReport')">
+        <i class="fas fa-coins icon-img"></i> Expenses
+    </button> 
+    
+</div>
+
+<!-- Open Button -->
+<button class="open-btn" onclick="openNav()">&#9776; water 2.3</button>
+
+</div>
+    <div id="customerForm" class="tab-content">
+        <div class="sales-report-header">
+            <h2>Customer Form</h2>
+            <img src="images/three-men-94.png" alt="Sales Report Animation" />
+            </div>
+        <form id="customerFormElement">
+        <fieldset class="grouped-section">
+                <legend>Personal Information</legend>     
+            <label for="customerName"><i class="fa-regular fa-user"></i> Company/Customer Name:</label>
+            <input type="text" id="customerName" name="customerName" required><br>
+            <label for="category"><i class="fa-regular fa-clipboard"></i> Category:</label>
+            <select id="category" name="category" required>
+                <option value="">Select Category</option>
+                <option value="Residential">Residential</option>
+                <option value="Commercial">Commercial</option>
+                <option value="Industrial">Industrial</option>
+                <option value="Government">Government</option>
+            </select><br>
+            <div id="contactPersonDiv" style="display: none;">
+                <label for="contactPerson"><i class="far fa-address-book"></i> Contact Person:</label>
+                <input type="text" id="contactPerson" name="contactPerson"><br>
+            </div>
+            <label for="tinNumber"><i class="fas fa-expand"></i> TIN Number:</label>
+			<input type="text" id="tinNumber" name="tinNumber" maxlength="15" placeholder="123-456-789-000"><br>
+        </fieldset>
+        <fieldset class="grouped-section">
+            <legend>Address</legend>         
+            <label for="street"><i class="far fa-address-card"></i> Street:</label>
+            <input type="text" id="street" name="street"><br>
+            <label for="barangay"><i class="far fa-address-card"></i> Barangay:</label>
+            <input type="text" id="barangay" name="barangay"><br>
+            <label for="city"><i class="far fa-address-card"></i> City:</label>
+            <input type="text" id="city" name="city" value="Batangas City" required><br>
+        </fieldset>
+        <fieldset class="grouped-section">
+            <legend>Contact Information and Prices</legend>         
+            <label for="email"><i class="far fa-paper-plane"></i> Email:</label>
+            <input type="email" id="email" name="email" required placeholder="example@example.com">
+            <label for="contactNumber"><i class="fas fa-phone"></i> Contact Number:</label>
+            <input type="text" id="contactNumber" name="contactNumber" required><br>
+            <label for="pricePerBottle"><i class="far fa-credit-card"></i> Price per Bottle:</label>
+            <select id="pricePerBottle" name="pricePerBottle" required>
+                <option value="">Select Price</option>
+                <option value="30">30</option>
+                <option value="35">35</option>
+                <option value="40">40</option>
+                <option value="3/100">3/100</option>
+            </select><br>
+            <label for="status"><i class="fas fa-toggle-off"></i> Status:</label>
+            <select id="status" name="status" required>
+                <option value="">Select Status</option>
+                <option value="Active">Active</option>
+                <option value="Non-Active">Non-Active</option>
+            </select><br>
+        </fieldset>
+            <!-- <button type="button" onclick="addCustomer()">Add Customer</button> -->
+            <button onclick="addCustomer()"><i class="fas fa-user-plus"></i> Add Customer</button>
+        </form>
+    </div>
+
+    <div id="customerReport" class="tab-content" style="display:none;">
+        <h2>Customer Report</h2>
+        <button id="exportCustomerForm">Export Customer Data to CSV</button>
+        <input type="file" id="importCustomerFile" accept=".csv" onchange="importDataFromCSV('customerForm', event)">
+        <div id="customerTableWrapper">
+            <table id="customerTable">
+            <thead>
+                <tr>
+                    <th>Cust No</th>
+                    <th>Customer Name</th>
+                    <th>Category</th>
+                    <th>Contact Person</th>
+                    <th>TIN Number</th>
+                    <th>Street</th>
+                    <th>Barangay</th>
+                    <th>City</th>
+                    <th>Email</th>
+                    <th>Contact Number</th>
+                    <th class="no-print">Price per Bottle</th>
+                    <th>Status</th>
+                    <th class="no-print">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+
+    <!-- Customer rows will be added here dynamically -->
+            </tbody>
+        </table>
+        <button onclick="exportCustomerReport()">Export Customer Report to Excel</button>
+        <button onclick="printCustomerReport()">Print Preview</button>
+    </div>
+    </div>
+
+    <div id="salesForm" class="tab-content" style="display:none;">
+        <div class="sales-report-header">
+        <h2>Sales</h2>
+        <img src="images/sales-48.png" alt="Sales Report Animation" />
+        </div>
+        <form id="salesFormElement">      
+            <fieldset class="grouped-section">
+                <legend>Receipts Information</legend>
+                <!-- Batch Number with 3-digit formatting -->
+                <label for="batchno"><i class="fas fa-money-check-alt"></i> Batch Number:</label>
+                <input type="number" id="batchno" name="batchno" min="1" max="999" oninput="formatBatchNumber()"><br>                     
+                <label for="salesDate" class="small-label"><i class="far fa-edit"></i> Date:</label>
+                <input type="date" id="salesDate" name="salesDate" required><br>
+            
+                <div class="form-group">
+                    <label for="orderSlip" class="small-label"><i class="far fa-edit"></i> Order Slip:</label>
+                        <input type="text" id="orderSlip" name="orderSlip" readonly>
+                    <label class="switch">
+                        <input type="checkbox" id="toggleOrderSlip">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+    
+                <div class="form-group">
+                    <label for="salesInvoice" class="small-label"><i class="far fa-edit"></i> Sales Invoice:</label>
+                        <input type="text" id="salesInvoice" name="salesInvoice" readonly>
+                    <label class="switch">
+                        <input type="checkbox" id="toggleSalesInvoice">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+    
+                <div class="form-group">
+                    <label for="orNumber" class="small-label"><i class="far fa-edit"></i> Official Receipt:</label>
+                        <input type="text" id="orNumber" name="orNumber" readonly>
+                    <label class="switch">
+                        <input type="checkbox" id="toggleOR">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+    
+                <div class="form-group">
+                    <label for="drNumber" class="small-label"><i class="far fa-edit"></i> Delivery Receipt:</label>
+                        <input type="text" id="drNumber" name="drNumber" readonly>
+                    <label class="switch">
+                        <input type="checkbox" id="toggleDR">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </fieldset>
+
+            <fieldset class="grouped-section">
+                <legend>Details</legend>
+                    <label for="salesCustomerName"><i class="fa-regular fa-user"></i> Customer Name:</label>
+                    <select id="salesCustomerName" name="salesCustomerName" required>
+                    <!-- Customer names will be added here dynamically -->
+                    <!-- Price per Bottle -->
+                    </select>
+                <label for="salesPricePerBottle"><i class="far fa-credit-card"></i> Price Per Bottle:</label>
+                <input type="text" id="salesPricePerBottle" readonly>
+                <label for="BottleInformation" class="highlight-label">Please Select Bottle Sizes</label>
+                <!-- </select><br> -->
+                <label for="slim"><i class="fas fa-wine-glass-alt"></i> Slim:</label>
+                <input type="number" id="slim" name="slim"><br>
+                <label for="round"><i class="fas fa-wine-glass"></i> Round:</label>
+                <input type="number" id="round" name="round"><br>
+                <label for="otherItems"><i class="fas fa-wine-bottle"></i> Other Items:</label>
+                <input type="text" id="otherItems" name="otherItems"><br>
+        </fieldset>
+        
+        <script>
+            // Function to format batch number to always be 3 digits
+            function formatBatchNumber() {
+                let batchnoField = document.getElementById('batchno');
+                let batchnoValue = batchnoField.value;
+        
+                // Ensure the batch number is between 1 and 999
+                if (batchnoValue) {
+                    batchnoField.value = ('000' + batchnoValue).slice(-3);  // Pad with leading zeros
+                }
+            }
+            </script>
+
+        <fieldset class="grouped-section">
+                <legend>Prices</legend>     
+                <label for="cashSales"><i class="fas fa-money-check-alt"></i> Cash Sales:</label>
+                <input type="number" id="cashSales" name="cashSales"><br>
+                <label for="accountReceivable"><i class="fas fa-money-check-alt"></i> Account Receivable:</label>
+                <input type="number" id="accountReceivable" name="accountReceivable"><br>
+                <label for="totalSales"><i class="fas fa-money-check-alt"></i> Total Sales:</label>
+                <input type="number" id="totalSales" name="totalSales"><br>
+        </fieldset>   
+
+        <fieldset class="grouped-section">
+            <legend>QR Code</legend>
+            <label for="myQRcode"><i class="fas fa-qrcode"></i> QR Code:</label>
+            <input type="text" id="myQRcode" name="myQRcode" placeholder="Scan Barcode Here"><br>
+            <p class="instruction-label">Please use Scanner in this area</p>
+        <script>
+            document.getElementById('myQRcode').addEventListener('input', function (event) {
+                let inputField = event.target;
+                let value = inputField.value.replace(/,\s*$/, ""); // Remove any trailing comma
+        
+                // Split the existing value by comma and check the last entry
+                let codes = value.split(", ");
+                let lastCode = codes[codes.length - 1];
+        
+                // If the last entry is exactly 10 digits, add a comma after it
+                if (lastCode.length === 10 && !value.endsWith(", ")) {
+                    inputField.value = value + ", ";
+                }
+            });
+        </script>
+        </fieldset>
+
+        <!-- <button type="button" onclick="addSales()">Add Sales</button> -->
+        <button onclick="addSales()"><i class="fas fa-user-plus"></i>Add This Transaction</button>
+
+    <!-- <fieldset class="grouped-section">     -->
+        <!-- <legend>QR Code using Mobile Device</legend>   -->
+        <!-- start qr new -->
+        <!-- <label for="qrCode">QR Code:</label> -->
+        <!-- <input type="text" id="qrCode" name="qrCode" readonly><br> -->
+        <!-- <h3>Scan QR Codes</h3> -->
+        <!-- <div id="my-qr-reader"></div> -->
+        <!-- <button type="button" onclick="startScan()">Start Scan</button> -->
+        <!-- fin qr new -->
+    </div>
+        <script
+            src="https://unpkg.com/html5-qrcode">
+        </script>
+        </form>      
+    </div>
+    <!-- </fieldset> -->
+
+<!-- process form -->
+<div id="processForm" class="tab-content" style="display:none;">
+    <form id="processForm" onsubmit="showVanRoute(event)">
+        <fieldset class="grouped-section">
+            <img src="images/truck.gif" alt="Sales Report Animation" style="width: 100px; height: auto;" />
+
+            <legend>Process Delivery</legend> 
+            <!-- Batch Number Dropdown -->
+            <label for="batchnoDropdown"><i class="fas fa-money-check-alt"></i> Select Batch Number:</label>
+            <select id="batchnoDropdown" name="batchnoDropdown">
+                <!-- Batch number options will be populated dynamically -->
+            </select>
+            <br>
+            <label for="carno"><i class="fas fa-money-check-alt"></i> Car Number:</label>
+            <input type="text" id="carno" name="carno"><br>
+        
+            <label for="timedept"><i class="fas fa-money-check-alt"></i> Time Departure:</label>
+            <input type="time" id="timedept" name="timedept"><br>
+        
+            <label for="remarks"><i class="far fa-closed-captioning"></i> Remarks:</label>
+            <input type="text" id="remarks" name="remarks"><br>
+        
+            <button type="submit" onclick="processForm()">Process</button>
+        </fieldset>
+        
+      
+        <!-- Section to display Van Picture and Google Map -->
+        <div id="vanReport">
+            <h3>Car Route Report</h3>
+            <!-- <div><img id="vanImage" src="" alt="Van Image" style="width: 300px; height: 200px; display: none;" /></div> -->
+            <div id="map" style="width: 100%; height: 500px;"></div>
+        </div>
+    </form>
+    </div>
+
+    <div id="salesReport" class="tab-content" style="display: none;">
+        <h2>Sales Report</h2>
+        <button id="exportSalesForm">Export Sales Data to CSV</button>
+        <input type="file" id="importSalesFile" accept=".csv" onchange="importDataFromCSV('salesForm', event)">
+        <table id="salesTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Order Slip</th>
+                    <th>Sales Invoice</th>
+                    <th>OR Number</th>
+                    <th>DR Number</th>
+                    <th>QR Code</th>
+                    <th>Customer Name</th>
+                    <th>Price Per Bottle</th>
+                    <th>Slim</th>
+                    <th>Round</th>
+                    <th>Other Items</th>
+                    <th>Cash Sales</th>
+                    <th>Account Receivable</th>
+                    <th>Total Sales</th>
+                    <th>Remarks</th>
+                    <th>Fuel</th>
+                    <th>LabTest</th>
+                    <th>Supplies</th>
+                    <th>Others</th>
+                    <th class="no-print">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <!-- Sales rows will be added here  -->
+            </tbody>
+        </table>
+        <button onclick="exportSalesReport()">Export Sales Report to Excel</button>
+        <button onclick="printSalesReport()">Print Preview</button>
+    </div>
+
+    <div id="productionData" class="tab-content" style="display: none;">
+        <h2> Bottle Collection Report</h2>
+        <button id="exportProductionData">Export Production Data to CSV</button>
+        <input type="file" id="importProductionFile" accept=".csv" onchange="importDataFromCSV('productionData', event)">
+        <table>
+          <thead>
+            <tr>
+              <th>Customer Name</th>
+              <th>QR Code</th>
+              <th>Barangay</th>
+              <th>City</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="productionTableBody">
+            <!-- Data will be inserted here by JavaScript -->
+          </tbody>
+        </table>
+      </div>
+
+
+   <!-- generate monthly report -->
+   <div id="monthlyReport" class="tab-content" style="display: none;">
+    <h2>Monthly Sales Report</h2>
+    <label for="monthSelect">Month:</label>
+    <select id="monthSelect">
+        <option value="1">January</option>
+        <option value="2">February</option>
+        <option value="3">March</option>
+        <option value="4">April</option>
+        <option value="5">May</option>
+        <option value="6">June</option>
+        <option value="7">July</option>
+        <option value="8">August</option>
+        <option value="9">September</option>
+        <option value="10">October</option>
+        <option value="11">November</option>
+        <option value="12">December</option>
+    </select>
+
+    <label for="yearSelect">  Year:</label>
+    <input type="number" id="yearSelect" value="2024" min="2000" max="2100">
+
+    <button onclick="generateMonthlySalesReport()">Generate Report</button>
+
+    <div id="monthlySalesResults"></div>
+</div>
+
+<div id="chartReport" class="tab-content" style="display: none;">
+    <h2>Chart & Expenses</h2>
+    <button id="exportProcessForm">Export Process Data to CSV</button>
+    <input type="file" id="importProcessFile" accept=".csv" onchange="importDataFromCSV('processForm', event)">
+        <fieldset class="grouped-section">
+            <legend><i class="fas fa-receipt"></i> Expenses</legend>
+            <button type="button" id="expensesBtn">Expenses</button>
+            <div id="expensesMenu" style="display: none; margin-top: 10px;">
+                <label for="Fuel" class="small-label"><i class="far fa-edit"></i> Fuel:</label>
+                <input type="text" id="Fuel" name="fuel" value="0"><br>
+        
+                <label for="labTest" class="small-label"><i class="far fa-edit"></i> Laboratory Test:</label>
+                <input type="text" id="labTest" name="labTest" value="0"><br>
+        
+                <label for="supplies" class="small-label"><i class="far fa-edit"></i> Supplies:</label>
+                <input type="text" id="supplies" name="supplies" value="0"><br>
+        
+                <label for="othersmisc" class="small-label"><i class="far fa-edit"></i> Others:</label>
+                <input type="text" id="othersmisc" name="othersmisc" value="0"><br>
+            </div>
+        </fieldset>
+        <canvas id="salesChart"></canvas> <!-- Chart will appear here -->
+    </div>
+    <script src="scripts.js"></script>
+</body>
+</html>
+
+<!-- handle gps -->
+ <script>
+    // Function to format batch number to 3 digits
+    function formatBatchNumber() {
+        let batchnoField = document.getElementById('batchno');
+        let batchnoValue = batchnoField.value;
+
+        if (batchnoValue) {
+            batchnoField.value = ('000' + batchnoValue).slice(-3);  // Ensure 3-digit format
+        }
+    }
+
+    // Function to initialize the Google Map
+    function initMap() {
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 10,
+            center: { lat: 14.5995, lng: 120.9842 }, // Example: Manila
+        });
+
+        return map;
+    }
+
+    // Function to add a route to the Google Map
+    function addRouteToMap(map) {
+        // Define the route (Example route points)
+        const routeCoordinates = [
+            { lat: 14.5995, lng: 120.9842 }, // Start point (Example: Manila)
+            { lat: 14.6760, lng: 121.0437 }, // End point (Example: Quezon City)
+        ];
+
+        const routePath = new google.maps.Polyline({
+            path: routeCoordinates,
+            geodesic: true,
+            strokeColor: "#FF0000",
+            strokeOpacity: 1.0,
+            strokeWeight: 4,
+        });
+
+        routePath.setMap(map);
+    }
+
+    // Function to show the van's route and picture
+    function showVanRoute(event) {
+        event.preventDefault();  // Prevent form submission
+
+        // Get the batch number from the form
+        const batchno = document.getElementById('batchno').value;
+
+        // Get the map element and initialize it
+        const map = initMap();
+        addRouteToMap(map);  // Add route to map
+
+        // Show the corresponding van image (You can set the source based on the batch number)
+        const vanImage = document.getElementById('vanImage');
+        if (batchno === "001") {
+            vanImage.src = "images/van1.png";  // Replace with actual image path
+        } else if (batchno === "002") {
+            vanImage.src = "images/van2.png";  // Replace with actual image path
+        } else {
+            vanImage.src = "images/default-van.png";  // Default van image
+        }
+        vanImage.style.display = "block";  // Show the image
+    }
+</script>
